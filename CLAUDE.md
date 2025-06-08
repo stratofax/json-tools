@@ -16,35 +16,41 @@ poetry add <package>
 poetry add --group dev <package>
 ```
 
-**Running the Application:**
+**Running the Application (Unix Philosophy):**
 ```bash
-# Run the main extractor (legacy - last 7 days only)
-poetry run python -m json_tools.aw_extractor
-
-# Or use the installed script
+# Install the tools
 poetry install
-aw-extractor
 
-# Extract data by date range (recommended)
-poetry run python -m json_tools.aw_date_extractor <file> --start YYYY-MM-DD --end YYYY-MM-DD
-aw-date-extractor <file> --start YYYY-MM-DD --end YYYY-MM-DD
+# Basic usage - each tool does one thing well and can be chained
+# 1. Filter by date range
+aw-filter data/file.json --start 2025-06-01 --end 2025-06-07
 
-# Process all JSON files in a directory
-aw-date-extractor -d <directory> --start YYYY-MM-DD --end YYYY-MM-DD
+# 2. Clean and deduplicate data
+aw-clean data/file.json
 
-# Examples:
-# Single file processing
-aw-date-extractor data/aw-watcher-web-brave.json --start 2025-06-01 --end 2025-06-07
-aw-date-extractor data/aw-watcher-vim.json --start 2025-06-06 --end 2025-06-06 --output custom.json
+# 3. Analyze data and generate reports
+aw-analyze data/file.json --format summary
 
-# Directory processing (processes all JSON files)
-aw-date-extractor -d data --start 2025-06-01 --end 2025-06-07
-aw-date-extractor --directory data --start 2025-06-06 --end 2025-06-06
+# Chain tools together (Unix pipeline style)
+cat data/file.json | aw-filter -s 2025-06-01 -e 2025-06-07 | aw-clean | aw-analyze
+
+# Process from stdin/stdout
+aw-filter data/file.json -s 2025-06-01 -e 2025-06-07 | aw-clean --min-duration 5 | aw-analyze --format summary
+
+# Process entire directories
+aw-filter -d data/ --start 2025-06-01 --end 2025-06-07
+aw-clean -d data/ --min-duration 5
+aw-analyze -d data/ --format summary --top 20
+
+# Save results to files
+aw-filter data/file.json -s 2025-06-01 -e 2025-06-07 > filtered.json
+cat filtered.json | aw-clean > cleaned.json
+cat cleaned.json | aw-analyze --format summary > analysis.json
 ```
 
 **Code Style:**
 ```bash
-# Lint with flake8 (when configured)
+# Lint with flake8
 poetry run flake8 json_tools/
 ```
 
@@ -52,9 +58,10 @@ poetry run flake8 json_tools/
 
 This is a Python package for processing JSON data exports from ActivityWatch, supporting multiple data sources including web browsing, window activity, vim usage, afk tracking, and more.
 
-**Core Components:**
-- `json_tools/aw_extractor.py` - Legacy module for web browsing analysis (last 7 days only)
-- `json_tools/aw_date_extractor.py` - Flexible date range extractor for any ActivityWatch file type
+**Core Components (Unix Philosophy):**
+- `json_tools/aw_filter.py` - Filter ActivityWatch events by date range (stdin/stdout)
+- `json_tools/aw_clean.py` - Clean and deduplicate events (stdin/stdout)
+- `json_tools/aw_analyze.py` - Analyze events and generate reports (stdin/stdout)
 - `data/` - Input directory for JSON files (git-ignored)  
 - `output/` - Generated output files (git-ignored)
 
@@ -65,26 +72,217 @@ This is a Python package for processing JSON data exports from ActivityWatch, su
 - `aw-watcher-afk-*` - Away-from-keyboard tracking
 - `aw-watcher-obsidian-*` - Obsidian note-taking activity
 
-**Data Flow (aw_date_extractor):**
-1. Load ActivityWatch JSON export(s) - single file or all files in directory
-2. Parse bucket metadata (type, client, hostname) for each file
-3. Filter events by specified date range using timestamps
-4. Preserve complete JSON structure in output files
-5. Generate filtered export files with extraction metadata
-6. Provide processing summary for directory mode
+**Unix Philosophy Design:**
+1. **aw-filter**: Do one thing well (date filtering)
+   - Reads JSON from stdin or file
+   - Filters events by date range
+   - Outputs filtered JSON to stdout
+   - Supports directory batch processing
 
-**Key Functions (aw_date_extractor):**
-- `load_activitywatch_data()` - Parse ActivityWatch bucket structure
-- `parse_date()` - Flexible date parsing (multiple formats)
-- `is_within_date_range()` - Date filtering with dateutil
-- `get_json_files_in_directory()` - Find all JSON files in directory
-- `process_single_file()` - Extract data from one file
-- `save_filtered_data()` - Preserve original JSON structure in output
+2. **aw-clean**: Do one thing well (data cleaning)
+   - Reads JSON from stdin or file
+   - Removes duplicates, merges consecutive events
+   - Filters by duration, excludes system apps
+   - Outputs cleaned JSON to stdout
 
-**Directory Processing Features:**
-- Processes all `.json` files in specified directory
-- Auto-generates unique output filenames for each processed file
-- Provides processing summary with success/failure counts
-- Gracefully handles files with no matching date range entries
+3. **aw-analyze**: Do one thing well (data analysis)
+   - Reads JSON from stdin or file
+   - Generates comprehensive usage statistics
+   - Outputs analysis as JSON to stdout
+   - Supports summary and full report formats
 
+**Pipeline Processing:**
+- Tools work together through pipes
+- Each tool handles text streams (JSON)
+- Can process single files or directories
+- Results can be chained: `aw-filter | aw-clean | aw-analyze`
+
+**Common Data Format:**
 All ActivityWatch exports have consistent structure: buckets containing events with `timestamp`, `duration`, and `data` fields. The `data` content varies by watcher type (URLs for web, filenames for vim, app names for window tracking, etc.).
+
+## Tool-Specific Usage
+
+### aw-filter (Date Range Filtering)
+
+**Purpose**: Filter ActivityWatch events by date range
+**Input**: ActivityWatch JSON (stdin or file)
+**Output**: Filtered ActivityWatch JSON (stdout)
+
+```bash
+# Basic usage
+aw-filter input.json --start 2025-06-01 --end 2025-06-07
+
+# From stdin
+cat input.json | aw-filter -s 2025-06-01 -e 2025-06-07
+
+# Directory mode
+aw-filter -d data/ --start 2025-06-01 --end 2025-06-07
+
+# Supported date formats
+--start 2025-06-01        # YYYY-MM-DD
+--start 06/01/2025        # MM/DD/YYYY  
+--start 01/06/2025        # DD/MM/YYYY
+--start 20250601          # YYYYMMDD
+```
+
+### aw-clean (Data Cleaning)
+
+**Purpose**: Clean and deduplicate ActivityWatch events
+**Input**: ActivityWatch JSON (stdin or file)
+**Output**: Cleaned ActivityWatch JSON (stdout)
+
+```bash
+# Basic usage
+aw-clean input.json
+
+# From stdin
+cat input.json | aw-clean
+
+# Custom options
+aw-clean input.json \
+  --min-duration 5 \           # Remove events < 5 seconds
+  --max-gap 60 \              # Merge events with gaps <= 60 seconds
+  --no-merge \                # Disable consecutive event merging
+  --no-dedupe \               # Disable duplicate removal
+  --keep-zero-duration \      # Keep zero-duration events
+  --exclude-apps Browser Slack # Exclude specific applications
+
+# Directory mode
+aw-clean -d data/ --min-duration 3
+```
+
+### aw-analyze (Data Analysis)
+
+**Purpose**: Analyze ActivityWatch events and generate reports
+**Input**: ActivityWatch JSON (stdin or file)
+**Output**: Analysis results as JSON (stdout)
+
+```bash
+# Basic usage (full analysis)
+aw-analyze input.json
+
+# Summary report
+aw-analyze input.json --format summary
+
+# From stdin
+cat input.json | aw-analyze --format summary
+
+# Custom top items count
+aw-analyze input.json --format summary --top 20
+
+# Directory mode
+aw-analyze -d data/ --format summary --top 15
+```
+
+**Output Formats:**
+
+*Full Format* (default):
+- Complete statistics including apps, daily/hourly breakdowns, URLs
+- Raw duration values and formatted strings
+- Device information and date ranges
+
+*Summary Format*:
+- Top N apps/URLs by duration with percentages
+- Daily and hourly summaries with formatted durations
+- Overview statistics
+
+## Pipeline Examples
+
+### Basic Workflows
+
+```bash
+# Filter → Analyze
+aw-filter data.json -s 2025-06-01 -e 2025-06-07 | aw-analyze --format summary
+
+# Filter → Clean → Analyze
+cat data.json | aw-filter -s 2025-06-01 -e 2025-06-07 | aw-clean | aw-analyze
+
+# Clean → Analyze (without date filtering)
+aw-clean data.json --min-duration 10 | aw-analyze --format summary --top 5
+```
+
+### Advanced Workflows
+
+```bash
+# Process multiple files with date filtering and analysis
+for file in data/aw-watcher-*.json; do
+  aw-filter "$file" -s 2025-06-01 -e 2025-06-07
+done | aw-clean --min-duration 5 | aw-analyze --format summary
+
+# Save intermediate results for debugging
+aw-filter data.json -s 2025-06-01 -e 2025-06-07 > step1.json
+cat step1.json | aw-clean --min-duration 3 > step2.json  
+cat step2.json | aw-analyze --format full > final.json
+
+# Compare different cleaning settings
+cat data.json | aw-filter -s 2025-06-01 -e 2025-06-07 | aw-clean | aw-analyze > analysis1.json
+cat data.json | aw-filter -s 2025-06-01 -e 2025-06-07 | aw-clean --no-merge | aw-analyze > analysis2.json
+```
+
+### Use Case Examples
+
+```bash
+# Web browsing analysis
+cat data/aw-watcher-web-*.json | \
+  aw-filter -s 2025-06-01 -e 2025-06-07 | \
+  aw-clean --min-duration 10 | \
+  aw-analyze --format summary --top 20
+
+# Development productivity tracking
+cat data/aw-watcher-vim-*.json | \
+  aw-filter -s 2025-06-01 -e 2025-06-07 | \
+  aw-clean --min-duration 30 | \
+  aw-analyze --format summary
+
+# Window activity analysis
+cat data/aw-watcher-window-*.json | \
+  aw-filter -s 2025-06-01 -e 2025-06-07 | \
+  aw-clean --exclude-apps UserNotificationCenter loginwindow | \
+  aw-analyze --format full
+```
+
+## Error Handling
+
+All tools follow Unix conventions:
+- Exit code 0 for success
+- Exit code 1 for errors
+- Error messages sent to stderr
+- JSON output sent to stdout
+
+```bash
+# Check for errors
+aw-filter data.json -s 2025-06-01 -e 2025-06-07 2>errors.log
+if [ $? -eq 0 ]; then
+  echo "Success"
+else
+  echo "Error occurred, check errors.log"
+fi
+
+# Pipe with error handling
+cat data.json | aw-filter -s 2025-06-01 -e 2025-06-07 2>/dev/null | aw-clean | aw-analyze
+```
+
+## Development Guidelines
+
+When working on this codebase:
+
+1. **Maintain Unix Philosophy**: Each tool should do one thing well
+2. **Preserve JSON Structure**: Maintain ActivityWatch bucket/event format
+3. **Support Stdin/Stdout**: All tools must work in pipelines
+4. **Handle Multiple Formats**: Support various ActivityWatch file types
+5. **Error to Stderr**: Send errors to stderr, data to stdout
+6. **Consistent CLI**: Use similar argument patterns across tools
+7. **Test Pipelines**: Verify tools work together correctly
+
+**Code Quality:**
+- Run `poetry run flake8 json_tools/` before committing
+- Follow PEP 8 style guidelines
+- Use type hints for better code clarity
+- Handle errors gracefully with proper exit codes
+
+**Adding New Features:**
+- Consider which tool should handle the feature (filter/clean/analyze)
+- Maintain backward compatibility with existing pipelines
+- Add appropriate command-line options
+- Update help text and examples
+- Test with real ActivityWatch data

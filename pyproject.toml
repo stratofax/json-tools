@@ -7,13 +7,18 @@ readme = "README.md"
 packages = [{include = "json_tools"}]
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = "^3.9"
 python-dateutil = "^2.9.0"
+
+[tool.poetry.group.dev.dependencies]
+flake8 = "^7.2.0"
+autopep8 = "^2.3.2"
 
 [build-system]
 requires = ["poetry-core>=2.0.0"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.scripts]
-aw-extractor = "json_tools.aw_extractor:main"
-aw-date-extractor = "json_tools.aw_date_extractor:main"
+aw-filter = "json_tools.aw_filter:main"
+aw-clean = "json_tools.aw_clean:main"
+aw-analyze = "json_tools.aw_analyze:main"
