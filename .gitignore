@@ -35,6 +35,7 @@ MANIFEST
 # Project specific ignores
 data/
 output/
+output_week/
 
 # Installer logs
 pip-log.txt
