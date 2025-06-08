@@ -1,0 +1,60 @@
+{
+  "buckets": {
+    "aw-watcher-vim_test-machine.local": {
+      "id": "aw-watcher-vim_test-machine.local",
+      "created": "2025-06-01T00:00:00.000000+00:00",
+      "name": null,
+      "type": "app.editor.activity",
+      "client": "aw-watcher-vim",
+      "hostname": "test-machine.local",
+      "data": {},
+      "events": [
+        {
+          "timestamp": "2025-06-01T09:15:00.000000+00:00",
+          "duration": 45.8,
+          "data": {
+            "file": "/home/user/projects/json-tools/main.py",
+            "language": "python",
+            "project": "json-tools"
+          }
+        },
+        {
+          "timestamp": "2025-06-01T09:16:00.000000+00:00",
+          "duration": 120.3,
+          "data": {
+            "file": "/home/user/projects/json-tools/tests/test_filter.py",
+            "language": "python", 
+            "project": "json-tools"
+          }
+        },
+        {
+          "timestamp": "2025-06-01T09:18:05.000000+00:00",
+          "duration": 2.1,
+          "data": {
+            "file": "/home/user/projects/json-tools/README.md",
+            "language": "markdown",
+            "project": "json-tools"
+          }
+        },
+        {
+          "timestamp": "2025-06-02T11:00:00.000000+00:00",
+          "duration": 300.5,
+          "data": {
+            "file": "/home/user/projects/other-project/server.js",
+            "language": "javascript",
+            "project": "other-project"
+          }
+        },
+        {
+          "timestamp": "2025-06-03T15:30:00.000000+00:00",
+          "duration": 180.0,
+          "data": {
+            "file": "/home/user/projects/json-tools/json_tools/aw_clean.py",
+            "language": "python",
+            "project": "json-tools"
+          }
+        }
+      ]
+    }
+  }
+}

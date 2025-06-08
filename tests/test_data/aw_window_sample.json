@@ -1,0 +1,79 @@
+{
+  "buckets": {
+    "aw-watcher-window_test-machine.local": {
+      "id": "aw-watcher-window_test-machine.local",
+      "created": "2025-06-01T00:00:00.000000+00:00",
+      "name": null,
+      "type": "currentwindow",
+      "client": "aw-watcher-window",
+      "hostname": "test-machine.local",
+      "data": {},
+      "events": [
+        {
+          "timestamp": "2025-06-01T09:00:00.000000+00:00",
+          "duration": 300.0,
+          "data": {
+            "app": "Code",
+            "title": "main.py - json-tools - Visual Studio Code"
+          }
+        },
+        {
+          "timestamp": "2025-06-01T09:05:00.000000+00:00",
+          "duration": 0.5,
+          "data": {
+            "app": "UserNotificationCenter",
+            "title": "Notification"
+          }
+        },
+        {
+          "timestamp": "2025-06-01T09:05:00.500000+00:00",
+          "duration": 25.0,
+          "data": {
+            "app": "Code",
+            "title": "main.py - json-tools - Visual Studio Code"
+          }
+        },
+        {
+          "timestamp": "2025-06-01T09:05:25.500000+00:00",
+          "duration": 120.0,
+          "data": {
+            "app": "Terminal",
+            "title": "Terminal — python test.py"
+          }
+        },
+        {
+          "timestamp": "2025-06-01T09:07:25.500000+00:00",
+          "duration": 180.5,
+          "data": {
+            "app": "Brave Browser",
+            "title": "GitHub - user/repo"
+          }
+        },
+        {
+          "timestamp": "2025-06-02T10:30:00.000000+00:00",
+          "duration": 450.2,
+          "data": {
+            "app": "Slack",
+            "title": "team-chat - Slack"
+          }
+        },
+        {
+          "timestamp": "2025-06-02T10:37:30.200000+00:00",
+          "duration": 1.0,
+          "data": {
+            "app": "loginwindow",
+            "title": "Login Window"
+          }
+        },
+        {
+          "timestamp": "2025-06-03T14:00:00.000000+00:00",
+          "duration": 600.0,
+          "data": {
+            "app": "Vim",
+            "title": "config.json - vim"
+          }
+        }
+      ]
+    }
+  }
+}

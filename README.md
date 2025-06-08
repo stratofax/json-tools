@@ -269,7 +269,7 @@ cat data/aw-watcher-vim-*.json | \
 - **Code Style**: Follows PEP 8, enforced with flake8
 - **Python Version**: Requires Python 3.9+
 - **Tools Architecture**: Each tool follows Unix philosophy principles
-- **Testing**: Test individual tools and pipeline combinations
+- **Testing**: Comprehensive pytest suite with 88 tests and 78% coverage
 
 ### Development Commands
 ```bash
@@ -279,10 +279,36 @@ poetry install
 # Run linting
 poetry run flake8 json_tools/
 
+# Run tests with coverage
+poetry run pytest tests/ -v --cov=json_tools --cov-report=term-missing
+
 # Run individual tools
 poetry run aw-filter --help
 poetry run aw-clean --help  
 poetry run aw-analyze --help
+```
+
+### Testing
+
+The project includes comprehensive testing infrastructure:
+
+- **88 tests** across all modules with **78% code coverage**
+- **Unit tests** for individual functions and edge cases
+- **Integration tests** with real ActivityWatch data
+- **CLI interface tests** for all command-line scenarios
+- **Pipeline tests** to verify tools work together correctly
+
+```bash
+# Run all tests
+poetry run pytest tests/
+
+# Run tests for specific module
+poetry run pytest tests/test_aw_filter.py
+poetry run pytest tests/test_aw_clean.py
+poetry run pytest tests/test_aw_analyze.py
+
+# Run with verbose output and coverage
+poetry run pytest tests/ -v --cov=json_tools --cov-report=html
 ```
 
 ## Migration from Legacy Tools

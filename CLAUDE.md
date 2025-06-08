@@ -48,10 +48,21 @@ cat filtered.json | aw-clean > cleaned.json
 cat cleaned.json | aw-analyze --format summary > analysis.json
 ```
 
-**Code Style:**
+**Testing and Code Quality:**
 ```bash
 # Lint with flake8
 poetry run flake8 json_tools/
+
+# Run comprehensive test suite (88 tests, 78% coverage)
+poetry run pytest tests/ -v --cov=json_tools --cov-report=term-missing
+
+# Run tests for specific module
+poetry run pytest tests/test_aw_filter.py
+poetry run pytest tests/test_aw_clean.py  
+poetry run pytest tests/test_aw_analyze.py
+
+# Generate HTML coverage report
+poetry run pytest tests/ --cov=json_tools --cov-report=html
 ```
 
 ## Project Architecture
@@ -280,9 +291,20 @@ When working on this codebase:
 - Use type hints for better code clarity
 - Handle errors gracefully with proper exit codes
 
+**Testing Infrastructure:**
+The project includes comprehensive testing:
+- **88 tests** with **78% code coverage** across all modules
+- **Unit tests**: Individual function testing with edge cases
+- **Integration tests**: Real ActivityWatch data processing
+- **CLI tests**: Command-line interface validation
+- **Pipeline tests**: Tool chaining verification
+- **Test data**: Realistic ActivityWatch JSON files in `tests/test_data/`
+
 **Adding New Features:**
 - Consider which tool should handle the feature (filter/clean/analyze)
 - Maintain backward compatibility with existing pipelines
 - Add appropriate command-line options
 - Update help text and examples
+- **Write tests** for new functionality (maintain high coverage)
 - Test with real ActivityWatch data
+- Verify pipeline compatibility

@@ -32,12 +32,12 @@ def analyze_events(events: List[Dict[str, Any]]) -> Dict[str, Any]:
         return {
             'total_events': 0,
             'total_duration': 0,
-            'total_duration_formatted': '0s',
+            'total_duration_formatted': format_duration(0),
             'apps': {},
             'devices': {},
             'daily': {},
             'hourly': {},
-            'top_urls': {},
+            'urls': {},
             'date_range': {}
         }
 

@@ -1,0 +1,18 @@
+[
+  {
+    "timestamp": "2025-06-01T12:00:00.000000+00:00",
+    "duration": 45.0,
+    "data": {
+      "url": "https://example.com",
+      "title": "Example Website"
+    }
+  },
+  {
+    "timestamp": "2025-06-01T12:01:00.000000+00:00",
+    "duration": 90.0,
+    "data": {
+      "url": "https://test.com",
+      "title": "Test Website"
+    }
+  }
+]
